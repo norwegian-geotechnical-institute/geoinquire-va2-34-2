@@ -1,3 +1,6 @@
+
+[![DOI](https://zenodo.org/badge/792319296.svg)](https://zenodo.org/doi/10.5281/zenodo.11073060)
+
 # Introduction 
 This repository contains the codes for the Geo-INQUIRE tool to compute the rainfall-induced landslide hazard over an area. This verison of the code assumes a constant 24-h rainfall acummulation over the entire area covered by the susceptibility map.
 
@@ -28,3 +31,4 @@ Results from the Hazard Tool are saved in the following folder which is authomat
 
 # Contribute
 Work in a separate branch. Do a pull request to merge with main. Merging with main requires review.
+
