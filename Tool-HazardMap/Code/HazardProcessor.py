@@ -40,6 +40,8 @@ class HazardProcessor(ABC):
         
         if UserParam["mode"] == "constant":
             self.in_acum = np.float32(UserParam["input rain"])
+        if UserParam["mode"] == "map":
+            self.name_in_rain = UserParam["input rain map name"]
     
         # Multiprocess param
         self.MULTIPROCESSING = kwargs['MULTIPROCESSING']
