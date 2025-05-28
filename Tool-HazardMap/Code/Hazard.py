@@ -48,7 +48,7 @@ from HazardProcessor import HazardProcessor
 ## Define input parameters
 KWARGS = {
     "sclass": [1, 2, 3, 4, 5],
-    "I_lim": [0.7, 2.0, 3.7, 5.0],
+    "I_lim": [0.72, 2.0, 3.7, 5.0],
     "epsg_wgs84": 4326,
     'MULTIPROCESSING': False,
     'MAX_NUMBER_OF_PROCESSES': 10,
@@ -195,6 +195,9 @@ class CalcHazard(HazardProcessor):
         # Normalize
         I24norm_da = (acum24-MeanRain)/StdRain
         
+        # Set normalized value to -9999 where rainfall is <= 5 mm
+        I24norm_da[acum24 <= 5] = -9999 #This is done to trat extremely small rainfall differently
+        
         return(I24norm_da)
     
     def ComputeRainHazard(self, I24norm_da, I_lim, file_name1, ncols, nrows, kwds):
@@ -213,21 +216,18 @@ class CalcHazard(HazardProcessor):
         
         RainHazard_aux = np.zeros_like(aux)
         
-        # Assign rain hazard
-        for ii in range(len(I_lim)): 
+        # Assign rain hazard based on I_lim thresholds (Classes 1 to len(I_lim))
+        for ii in range(len(I_lim)):
             if ii == 0:
-                mask = (aux <= ii)
+                mask = (aux > -9999) & (aux < I_lim[ii])  # First rainhazard class, all -9999 will remain as 0 in this case
                 RainHazard_aux = np.where(mask, ii + 1, RainHazard_aux)
             else:
-                if ii < 3:
-                    mask = (aux <= ii) & (aux > ii-1)
-                    RainHazard_aux = np.where(mask, ii + 1, RainHazard_aux)
-                else:
-                    mask = (aux <= ii) & (aux > ii-1)
-                    RainHazard_aux = np.where(mask, ii + 1, RainHazard_aux)
-                    
-                    mask = (aux > ii)
-                    RainHazard_aux = np.where(mask, ii + 2, RainHazard_aux)
+                mask = (aux >= I_lim[ii - 1]) & (aux < I_lim[ii])
+                RainHazard_aux = np.where(mask, ii + 1, RainHazard_aux)
+
+        # Handle values greater than or equal to the last threshold (Class len(I_lim)+1)
+        mask = aux >= I_lim[-1]
+        RainHazard_aux = np.where(mask, len(I_lim) + 1, RainHazard_aux)
         
         # Save to file
         folder_out = self.path_out / self.mode
@@ -265,6 +265,13 @@ class CalcHazard(HazardProcessor):
         
         # Check hazard by going through hazard matrix
         hazard_aux = np.where(np.isnan(susc_da), np.nan, hazard_aux)
+
+        mask = (susc_da == 1) & (RainHazard_aux == 3)
+        hazard_aux = np.where(mask, 1, hazard_aux)
+        mask = (susc_da == 1) & (RainHazard_aux == 4)
+        hazard_aux = np.where(mask, 2, hazard_aux)
+        mask = (susc_da == 1) & (RainHazard_aux == 5)
+        hazard_aux = np.where(mask, 3, hazard_aux)
         
         mask = (susc_da == 2) & (RainHazard_aux == 2)
         hazard_aux = np.where(mask, 1, hazard_aux)
@@ -275,6 +282,8 @@ class CalcHazard(HazardProcessor):
         mask = (susc_da == 2) & (RainHazard_aux == 5)
         hazard_aux = np.where(mask, 5, hazard_aux)
         
+        mask = (susc_da == 3) & (RainHazard_aux == 1)
+        hazard_aux = np.where(mask, 1, hazard_aux)
         mask = (susc_da == 3) & (RainHazard_aux == 2)
         hazard_aux = np.where(mask, 2, hazard_aux)
         mask = (susc_da == 3) & (RainHazard_aux == 3)
@@ -284,6 +293,8 @@ class CalcHazard(HazardProcessor):
         mask = (susc_da == 3) & (RainHazard_aux == 5)
         hazard_aux = np.where(mask, 10, hazard_aux)
         
+        mask = (susc_da == 4) & (RainHazard_aux == 1)
+        hazard_aux = np.where(mask, 2, hazard_aux)
         mask = (susc_da == 4) & (RainHazard_aux == 2)
         hazard_aux = np.where(mask, 3, hazard_aux)
         mask = (susc_da == 4) & (RainHazard_aux == 3)
@@ -293,6 +304,8 @@ class CalcHazard(HazardProcessor):
         mask = (susc_da == 4) & (RainHazard_aux == 5)
         hazard_aux = np.where(mask, 15, hazard_aux)
         
+        mask = (susc_da == 5) & (RainHazard_aux == 1)
+        hazard_aux = np.where(mask, 3, hazard_aux)
         mask = (susc_da == 5) & (RainHazard_aux == 2)
         hazard_aux = np.where(mask, 5, hazard_aux)
         mask = (susc_da == 5) & (RainHazard_aux == 3)
