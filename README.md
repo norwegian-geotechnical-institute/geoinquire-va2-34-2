@@ -4,6 +4,11 @@
 # Introduction 
 This repository contains the codes for the Geo-INQUIRE tool to compute the rainfall-induced landslide hazard over an area. This verison of the code can assume a constant 24-h rainfall acummulation over the entire area covered by the susceptibility map, or use a user-provided map with the 24h rainfall acummulations over the area covered by the susceptibility map.
 
+Precipitation-induced landslide hazard is one of the services included in the GEO-INQUIRE Virtual Access to products enabling curiosity-driven science for geohazard and multi-risk assessment
+(see https://www.geo-inquire.eu/virtual-access/geohazard-and-multi-risk-assessment for details).
+
+![GEO-INQUIRE project logo](Geo-INQUIRE_logo_small.png)
+
 # Getting Started
 1.	Installation process: The landslide hazard tool requires to have installed python and Poetry.
 2.	Software dependencies: Python version and dependecies are specified in the Poetry .toml file. 
