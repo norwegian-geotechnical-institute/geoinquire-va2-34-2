@@ -6,7 +6,7 @@ Implements the calculation of the hazard maps of the GIRI model.
 Rosa M Palau (NGI)     08.04.2024
 """
 import numpy as np
-import pandas as pd
+import yaml
 
 from pathlib import Path
 from multiprocessing import Process, Semaphore
@@ -32,16 +32,24 @@ class HazardProcessor(ABC):
         self.sclass = kwargs["sclass"]
         self.I_lim = kwargs["I_lim"]
         
-        # read user-defined parameters from excel file
-        inparam_file = self.path_data / "input_variables.xlsx"
-        df = pd.read_excel(inparam_file, header = None)
-        UserParam = dict(zip(df[0], df[1]))
-        self.mode = UserParam["mode"]
-        
-        if UserParam["mode"] == "constant":
-            self.in_acum = np.float32(UserParam["input rain"])
-        if UserParam["mode"] == "map":
-            self.name_in_rain = UserParam["input rain map name"]
+        # Read user-defined parameters from YAML file
+        inparam_file = self.path_data / "input_variables.yaml"
+        with open(inparam_file, "r", encoding="utf-8") as f:
+            user_param = yaml.safe_load(f) or {}
+
+        self.mode = user_param.get("mode")
+        if self.mode not in {"constant", "map"}:
+            raise ValueError("Invalid or missing 'mode' in input_variables.yaml. Use 'constant' or 'map'.")
+
+        if self.mode == "constant":
+            if "input_rain" not in user_param:
+                raise ValueError("Missing 'input_rain' in input_variables.yaml for mode 'constant'.")
+            self.in_acum = np.float32(user_param["input_rain"])
+
+        if self.mode == "map":
+            if "input_rain_map_name" not in user_param:
+                raise ValueError("Missing 'input_rain_map_name' in input_variables.yaml for mode 'map'.")
+            self.name_in_rain = str(user_param["input_rain_map_name"])
     
         # Multiprocess param
         self.MULTIPROCESSING = kwargs['MULTIPROCESSING']

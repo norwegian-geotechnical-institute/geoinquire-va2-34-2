@@ -10,34 +10,87 @@ Precipitation-induced landslide hazard is one of the services included in the GE
 ![GEO-INQUIRE project logo](Geo-INQUIRE_logo_small.png)
 
 # Getting Started
-1.	Installation process: The landslide hazard tool requires to have installed python and Poetry.
-2.	Software dependencies: Python version and dependecies are specified in the Poetry .toml file. 
 
-## REQUIRED INPUT DATA AND FILES:
-Input files must be saved (before running the hazard tool) in the ../Data/ folder:
-        - `input_variables.csv`: csv file where the mode and input rainfall can be specified.
-        - `*_sus.tif` : Tile of the susceptibility map over hazard will be computed. Must be downloaded from map repository.
-        - `StdMaxDayRain.txt`: Standard deviation of the maximum daily rainfall.
+## Before you start
+This tool cannot be run until a susceptibility tile (`*_sus.tif`) has been downloaded and placed in `Tool-HazardMap/Data/`.
 
-## RUN THE HAZARD TOOL:
-1. In place the tile of the susceptibiluty map covering the area you want to compute the hazard in the folder `./Tool-Hazard-Map/input`.
-2. In the case of wanting to use a spatial-variable rainfall map place it in the folder the folder `./Tool-Hazard-Map/input`. The map needs to be in ".tif" format, cover the area of the susceptibility map and use the WGS84 (EPSG: 4326) projection.
-3. Modify the `input_variables.csv` excel:
-        3.3. Select mode;  "constant" if you desire to apply a constat user-specified rainfall acummulation over an area. "map" if you desire to use your own rainfall map.
-        3.4. In case of using the mode "constant" specify the 24 h rainfall acummulation in [mm] over the area.
-        3.5. In case of using teh mode "map" specify the name of the .tif file containing the rainfall map (without the file extension).
+## Required input files
+Before running the tool, the following files must be present in `Tool-HazardMap/Data/`:
 
-5. The code you need to runn is stored in `./Tool-Hazard-Map/Code` folder
-6. Before you runn the code make sure you have activated the poetry enviroment: `poetry shell`
-7. From the `./Tool-Hazard-Map/Code` folder in the terminal run: `python Hazard.py`
-8. The outpurs are stored in the `../Results/constant/` folder.
+- `input_variables.yaml`: configuration file for the rainfall input
+- `*_sus.tif`: susceptibility tile(s) covering the area of interest
+- `StdMaxDayRain.asc`: standard deviation of the maximum daily rainfall
+- `MeanMaxDayRain.asc`: mean of the maximum daily rainfall
 
-## OUTPUT:
-Results from the Hazard Tool are saved in the following folder which is authomatically generated `../Results/constant/`
-1. Rainfall Hazard: Rainfall hazard class in .tif format. Saved as: `./RainHazard/*_RainHazard.tif`
-2. Hazard map: in .tif format. Saved as: `./Hazard/*_Hazard.tif`
+If you want to use spatially variable rainfall, also place your rainfall raster in `Tool-HazardMap/Data/`. The map must be in `.tif` format, cover the area of the susceptibility tile(s), and use WGS84 (`EPSG:4326`).
 
-23.04.2024
+## Download a susceptibility tile
+The susceptibility data are available at [https://zenodo.org/records/15119418](https://zenodo.org/records/15119418).
+
+Each susceptibility tile covers a 5 degree x 5 degree area, and the tile name encodes the lower-left corner of the tile:
+- `n` / `s` = north / south latitude
+- `e` / `w` = east / west longitude
+
+Example: `n60e005_sus.tif` covers latitude 60 to 65 N and longitude 5 to 10 E.
+
+For Kvam, Norway (around 60.37 N, 6.14 E), the lower boundaries are 60 and 5, so the correct tile is `n60e005_sus.tif`.
+
+### Linux example
+```bash
+cd Tool-HazardMap/Data
+
+wget -O Landslide_Susceptibility_GIRI_W5E5.zip \
+        https://zenodo.org/records/15119418/files/Landslide_Susceptibility_GIRI_W5E5.zip?download=1
+
+unzip -l Landslide_Susceptibility_GIRI_W5E5.zip | grep "n60e005_sus.tif"
+
+unzip -j Landslide_Susceptibility_GIRI_W5E5.zip \
+        "dem_tif_n60e000/n60e005_sus.tif" \
+        -d .
+```
+
+Notes:
+- Use `-j` to extract only the file, without the subfolder structure.
+- If you use the SSP126 scenario, replace the archive filename with `Landslide_Susceptibility_GIRI_SSP126.zip`.
+
+## Configure the tool
+Edit `Tool-HazardMap/Data/input_variables.yaml`.
+
+Use `mode: constant` for a single rainfall value over the whole area, or `mode: map` for a rainfall raster.
+
+Example configuration:
+
+```yaml
+mode: constant
+input_rain: 80
+input_rain_map_name: your_rainfall_map_name
+```
+
+For `mode: constant`, the tool reads `input_rain` as the 24-hour rainfall accumulation in millimeters.
+
+For `mode: map`, the tool reads `input_rain_map_name` as the name of the rainfall raster without the `.tif` extension.
+
+## Install dependencies
+The Python version and dependencies are defined in `Tool-HazardMap/Code/pyproject.toml`.
+
+From `Tool-HazardMap/Code`, run:
+
+```bash
+Code$ poetry install
+```
+
+## Run the tool
+From `Tool-HazardMap/Code`, run:
+
+```bash
+Code$ poetry run python Hazard.py
+```
+
+## Outputs
+Results are written to `Tool-HazardMap/Results/{mode}/`. The tool creates:
+1. Rainfall hazard raster: `RainHazard/*_RainHazard.tif`
+2. Landslide hazard raster: `Hazard/*_Hazard.tif`
+
 
 # Contribute
 Work in a separate branch. Do a pull request to merge with main. Merging with main requires review.
