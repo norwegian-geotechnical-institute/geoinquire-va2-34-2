@@ -149,7 +149,7 @@ class CalcHazard(HazardProcessor):
     
     def CreateCntRain(self, ncols, nrows):
         """
-        Creates am empty array like the input-susceptibility map filled with constant user-defined
+        Creates an empty array like the input-susceptibility map filled with constant user-defined
         24 h rainfall acummmulation value. 
             INPUT: 
                 -ncols, nrows: number of columns and number of rows 
