@@ -1,0 +1,16 @@
+# Generated output rasters
+Tool-HazardMap/Results/
+
+# Ignore user/downloaded data files by default, but keep baseline repo data trackable
+Tool-HazardMap/Data/*
+!Tool-HazardMap/Data/MeanMaxDayRain.asc
+!Tool-HazardMap/Data/StdMaxDayRain.asc
+!Tool-HazardMap/Data/input_variables.yaml
+
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Poetry virtual environment
+.venv/

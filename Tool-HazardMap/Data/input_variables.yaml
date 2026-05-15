@@ -1,0 +1,10 @@
+# Hazard tool runtime configuration
+# mode: "constant" or "map"
+mode: constant
+
+# Used when mode is "constant"
+input_rain: 80 # (24h accumulated rainfall in mm)
+
+# Used when mode is "map" (set the .tif filename without extension)
+input_rain_map_name: your_rainfall_map_name
+

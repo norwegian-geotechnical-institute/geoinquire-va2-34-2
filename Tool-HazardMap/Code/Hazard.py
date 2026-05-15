@@ -11,16 +11,17 @@ as a subclass of HazardProcessor.
 
 
 IMPORTANT:
-    - mode (constant/map) must be specified by the user in the "/Data/input_variables.xlsx" file.
-    - mode == constant: Rainfall ammount set by user as "input constant rain" in the ".xlsx" file.
-    - mode == map: 24h rainfall map provided by the user in wgs84. Filename set in ".xlsx" file.
+        - mode (constant/map) must be specified by the user in the "/Data/input_variables.yaml" file.
+        - mode == constant: Rainfall amount set by user as "input_rain" in the YAML file.
+        - mode == map: 24h rainfall map provided by the user in wgs84. Filename set as
+            "input_rain_map_name" in the YAML file.
 
 INPUT:
     Required input files to be saved in the ../Data/ folder:
-        - input_variables.csv: csv file where input rainfall can be specified.
+        - input_variables.yaml: YAML file where input rainfall can be specified.
         - *_sus.tif: Tile of the susceptibility map over hazard will be computed.
                             Must be downloaded from map repository.
-        - StdMaxDayRain.txt: Standar deviation of the maximum daily rainfall. 
+        - StdMaxDayRain.asc: Standar deviation of the maximum daily rainfall. 
 
 OUTPUT:
     Results saved in ../Results/constant/ folder
@@ -123,7 +124,7 @@ class CalcHazard(HazardProcessor):
         
         # files to read
         file_mean_day_rain = self.path_data / "MeanMaxDayRain.asc"
-        file_std_day_rain = self.path_data / "StdMaxDayRain.txt"
+        file_std_day_rain = self.path_data / "StdMaxDayRain.asc"
 
         
         # read rasters
@@ -148,7 +149,7 @@ class CalcHazard(HazardProcessor):
     
     def CreateCntRain(self, ncols, nrows):
         """
-        Creates am empty array like the input-susceptibility map filled with constant user-defined
+        Creates an empty array like the input-susceptibility map filled with constant user-defined
         24 h rainfall acummmulation value. 
             INPUT: 
                 -ncols, nrows: number of columns and number of rows 
