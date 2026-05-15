@@ -41,9 +41,11 @@ cd Tool-HazardMap/Data
 
 wget -O Landslide_Susceptibility_GIRI_W5E5.zip \
         https://zenodo.org/records/15119418/files/Landslide_Susceptibility_GIRI_W5E5.zip?download=1
-
+```
+```bash
 unzip -l Landslide_Susceptibility_GIRI_W5E5.zip | grep "n60e005_sus.tif"
-
+```
+```bash
 unzip -j Landslide_Susceptibility_GIRI_W5E5.zip \
         "dem_tif_n60e000/n60e005_sus.tif" \
         -d .
